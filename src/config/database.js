@@ -1,5 +1,3 @@
-import express from "express";
-import cors from "cors";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 
@@ -16,10 +14,4 @@ try {
   console.log(error.message);
 }
 
-const server = express();
-server.use(cors());
-server.use(express.json());
-
-
-
-server.listen(5000);
+export default db;
