@@ -10,9 +10,6 @@ export async function cadastroController(req, res) {
       name: req.body.name,
       email: req.body.email,
       password: passHash,
-    });
-    await db.collection("wallet").insertOne({
-      name: req.body.name,
       saldo: 0,
       registros: [],
     });
@@ -24,17 +21,23 @@ export async function cadastroController(req, res) {
 }
 
 export async function loginController(req, res) {
+  const email = req.body.email;
+  const pass = req.body.password;
   try {
-    const user = await db.collection("users").findOne(req.body.email);
-    if (user && bcrypt.compareSync(req.body.password, user.password)) {
-      const token = uuidV4();
+    const user = await db.collection("users").findOne({ email: email });
 
-      await db.collection("sessions").insertOne({ name: user.name, token });
+    const passmatch = await bcrypt.compare(pass, user.password);
 
-      res.status(200).send(session);
-    } else {
-      return res.send("Usuário ou senha incorretos");
+    if (!passmatch || !user) {
+      return res.send("Email ou senha incorretos");
     }
+
+    const token = uuid();
+    const session = { name: user.name, token };
+    await db.collection("sessions").insertOne(session);
+
+    console.log(session);
+    res.status(200).send(session);
   } catch (error) {
     return res.status(500).send(error.message);
   }
