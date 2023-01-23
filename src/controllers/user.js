@@ -1,4 +1,5 @@
 import db from "../config/database.js";
+import dayjs from 'dayjs';
 
 export async function userWallet(req, res) {
   const { name } = res.locals.session;
@@ -13,4 +14,37 @@ export async function userWallet(req, res) {
   } else {
     res.sendStatus(401);
   }
+}
+
+export async function updateWallet(req, res) {
+  const { name } = res.locals.session;
+
+  const { value, description, type } = req.body;
+
+  const carteira = await db.collection("users").findOne({ name });
+
+  const registro = {
+    value,
+    description,
+    type,
+    date: dayjs().format("DD/MM"),
+  };
+
+  if (type === "entrada") {
+    carteira.saldo += Number(value);
+  } else {
+    carteira.saldo -= Number(value);
+  }
+  carteira.saldo = Math.round(carteira.saldo * 100) / 100;
+
+  carteira.registros.push(registro);
+
+  await db
+    .collection("users")
+    .updateOne(
+      { name },
+      { $set: { saldo: carteira.saldo, registros: carteira.registros } }
+    );
+
+  res.sendStatus(201);
 }

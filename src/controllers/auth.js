@@ -36,7 +36,6 @@ export async function loginController(req, res) {
     const session = { name: user.name, token };
     await db.collection("sessions").insertOne(session);
 
-    console.log(session);
     res.status(200).send(session);
   } catch (error) {
     return res.status(500).send(error.message);
