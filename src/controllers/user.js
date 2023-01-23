@@ -1,5 +1,5 @@
 import db from "../config/database.js";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 export async function userWallet(req, res) {
   const { name } = res.locals.session;
@@ -35,8 +35,8 @@ export async function updateWallet(req, res) {
   } else {
     carteira.saldo -= Number(value);
   }
-  carteira.saldo = Math.round(carteira.saldo * 100) / 100;
 
+  carteira.saldo = carteira.saldo.toFixed(2);
   carteira.registros.push(registro);
 
   await db
